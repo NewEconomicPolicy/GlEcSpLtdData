@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import QApplication
 
 import getClimGenNC
 import hwsd_bil
+from glbl_ecsse_high_level_fns import simplify_soil_recs
 from prepare_ecosse_files import update_progress
 from getClimGenFns import check_clim_nc_limits, associate_climate
 
@@ -49,9 +50,28 @@ def generate_soil_output(form):
     wthr_csv = WthrCsvOutputs(form, climgen)
     wthr_csv.create_results_files()
 
+    # extract required values from the HWSD database and simplify if requested
+    # ========================================================================
     hwsd = hwsd_bil.HWSD_bil(form.lgr, form.hwsd_dir)
-    snglPntFlag = False
-    aoi_indices_fut, aoi_indices_hist = climgen.genLocalGrid(bbox, hwsd, snglPntFlag)
+
+    # TODO: patch to be sorted
+    # ========================
+    mu_global_pairs = {}
+    for mu_global in form.hwsd_mu_globals.mu_global_list:
+        mu_global_pairs[mu_global] = None
+
+    soil_recs = hwsd.get_soil_recs(mu_global_pairs)  # list is already sorted
+
+    # TODO: patch to be sorted
+    # ========================
+    for mu_global in hwsd.bad_muglobals:
+        del (soil_recs[mu_global])
+
+    form.hwsd_mu_globals.soil_recs = simplify_soil_recs(soil_recs)
+    form.hwsd_mu_globals.bad_mu_globals = [0] + hwsd.bad_muglobals
+    del (hwsd);
+    del (soil_recs)
+    aoi_indices_fut, aoi_indices_hist = climgen.genLocalGrid(bbox, hwsd)
 
     # step through each cell
     # ======================
