@@ -26,6 +26,58 @@ from getClimGenFns import check_clim_nc_limits, associate_climate
 
 HEADERS = ['latitude', 'longitude', 'mu_global', 'gran_lat', 'gran_lon']
 
+def generate_soil_output(form):
+    """
+    called from GUI
+    """
+    if form.hwsd_mu_globals == None:
+        print('Undetermined HWSD aoi - please select a valid HSWD csv file')
+        return
+
+    # bounding box defn
+    # =================
+    lat_ll = form.hwsd_mu_globals.lat_ll_aoi
+    lon_ll = form.hwsd_mu_globals.lon_ll_aoi
+    lat_ur = form.hwsd_mu_globals.lat_ur_aoi
+    lon_ur = form.hwsd_mu_globals.lon_ur_aoi
+    bbox = list([lon_ll, lat_ll, lon_ur, lat_ur])
+    form.bbox = bbox
+
+    # Create and initialise CSV object
+    # ================================
+    climgen = getClimGenNC.ClimGenNC(form)
+    wthr_csv = WthrCsvOutputs(form, climgen)
+    wthr_csv.create_results_files()
+
+    hwsd = hwsd_bil.HWSD_bil(form.lgr, form.hwsd_dir)
+    snglPntFlag = False
+    aoi_indices_fut, aoi_indices_hist = climgen.genLocalGrid(bbox, hwsd, snglPntFlag)
+
+    # step through each cell
+    # ======================
+    skipped, completed, warning_count = 3*[0]
+    last_time, start_time = 2*[time()]
+    ncells = form.hwsd_mu_globals.data_frame.shape[0]
+    for index, row in form.hwsd_mu_globals.data_frame.iterrows():
+        mu_global = int(row['mu_global'])
+        latitude = round(row['latitude'], 5)
+        longitude = round(row['longitude'], 5)
+        gran_lat = int(row['gran_lat'])
+        gran_lon = int(row['gran_lon'])
+
+        site_rec = list([gran_lat, gran_lon, latitude, longitude, mu_global, None])
+
+        completed += 1
+        last_time = update_progress(last_time, start_time, completed, ncells, skipped, warning_count)
+
+    # close CSV files
+    # ==============
+    for key in wthr_csv.output_fhs:
+        wthr_csv.output_fhs[key].close()
+    print('\nFinished processing')
+
+    return
+
 def _fetch_weather(form, climgen, site_rec, pettmp_grid_cell):
     """
     select requested time segment
@@ -60,9 +112,9 @@ def _fetch_weather(form, climgen, site_rec, pettmp_grid_cell):
     return pettmp_sim
 
 def generate_weather_only(form):
-    '''
+    """
     called from GUI
-    '''
+    """
     if form.hwsd_mu_globals == None:
         print('Undetermined HWSD aoi - please select a valid HSWD csv file')
         return
@@ -169,9 +221,9 @@ def generate_weather_only(form):
     return
 
 class WthrCsvOutputs(object):
-    '''
+    """
     Class to write CSV results of a Spatial ECOSSE run
-    '''
+    """
     def __init__(self, form, climgen):
 
         self.lgr = form.lgr
@@ -182,9 +234,9 @@ class WthrCsvOutputs(object):
         self.sim_end_year = climgen.sim_end_year
 
     def create_results_files(self):
-        '''
+        """
         Create empty results files
-        '''
+        """
         size_current = csv.field_size_limit(131072*4)
 
         self.output_fhs = {}
@@ -205,3 +257,4 @@ class WthrCsvOutputs(object):
 
             self.writers[varname] = csv.writer(self.output_fhs[varname], delimiter='\t')
             self.writers[varname].writerow(hdr_rec)
+        return

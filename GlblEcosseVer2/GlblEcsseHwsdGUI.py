@@ -25,7 +25,7 @@ from glbl_ecss_cmmn_cmpntsGUI import calculate_grid_cell, grid_resolutions
 
 from shape_funcs import format_bbox, calculate_area
 from glbl_ecsse_high_level_fns import generate_banded_sims
-from glbl_ecsse_wthr_only_fns import generate_weather_only
+from glbl_ecsse_wthr_only_fns import generate_weather_only, generate_soil_output
 
 from weather_datasets import change_weather_resource
 import hwsd_mu_globals_fns
@@ -323,7 +323,7 @@ class Form(QWidget):
         """
 
         """
-        generate_weather_only(self)
+        generate_soil_output(self)
 
     def adjustLuChckBoxes(self):
         """
