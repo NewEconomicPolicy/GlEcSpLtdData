@@ -42,11 +42,12 @@ STD_FLD_SIZE_180 = 180
 ERROR_STR = '*** Error *** '
 WARN_STR = '*** Warning *** '
 
-
 # ========================
 
 class Form(QWidget):
+    """
 
+    """
     def __init__(self, parent=None):
 
         super(Form, self).__init__(parent)
@@ -240,10 +241,19 @@ class Form(QWidget):
         w_wthr = QPushButton("Wthr only")
         helpText = 'Generate CSV weather data based on HWSD file for Marta-Joe project'
         w_wthr.setToolTip(helpText)
-        w_wthr.setFixedWidth(STD_BTN_SIZE_80)
+        w_wthr.setFixedWidth(STD_BTN_SIZE_100)
         grid.addWidget(w_wthr, irow, 6)
         w_wthr.clicked.connect(self.genWthrOnlyClicked)
         self.w_wthr = w_wthr
+
+        irow += 1
+        w_soil_outpts = QPushButton("Make soil files")
+        helpText = 'Generate CSV data of soil carbon (Dominant), pH and bulk density for the HoliSoils project'
+        w_soil_outpts.setToolTip(helpText)
+        w_soil_outpts.setFixedWidth(STD_BTN_SIZE_100)
+        grid.addWidget(w_soil_outpts, irow, 6)
+        w_soil_outpts.clicked.connect(self.genSoilOutptsClicked)
+        self.w_soil_outpts = w_soil_outpts
 
         # LH vertical box consists of png image
         # =====================================
@@ -264,7 +274,7 @@ class Form(QWidget):
         bot_hbox = QHBoxLayout()
         w_report = QTextEdit()
         w_report.verticalScrollBar().minimum()
-        w_report.setMinimumHeight(175)
+        w_report.setMinimumHeight(225)
         w_report.setMinimumWidth(1000)
         w_report.setStyleSheet('font: bold 10.5pt Courier')  # big jump to 11pt
         bot_hbox.addWidget(w_report, 1)
@@ -289,7 +299,7 @@ class Form(QWidget):
 
         # posx, posy, width, height
         self.setGeometry(200, 100, 690, 250)
-        self.setWindowTitle('Global Ecosse Ver 2b - generate sets of ECOSSE input files based on HWSD grid')
+        self.setWindowTitle('Generic Global Ecosse - generate sets of limited data ECOSSE input files based on HWSD grid')
 
         # reads and set values from last run
         # ==================================
@@ -309,6 +319,12 @@ class Form(QWidget):
         pass
         # print("Key was pressed, id is: ", self.w_inpt_choice.id(bttnWdgtId))
 
+    def genSoilOutptsClicked(self):
+        """
+
+        """
+        generate_weather_only(self)
+
     def adjustLuChckBoxes(self):
         """
 
@@ -324,11 +340,15 @@ class Form(QWidget):
         return
 
     def genWthrOnlyClicked(self):
+        """
 
+        """
         generate_weather_only(self)
 
     def weatherResourceChanged(self):
+        """
 
+        """
         change_weather_resource(self)
 
     def fetchCsvFile(self):
@@ -356,16 +376,22 @@ class Form(QWidget):
             self.w_lbl14.setText(check_lu_pi_json_fname(self))
 
     def resolutionChanged(self):
+        """
 
+        """
         granularity = 120
         calculate_grid_cell(self, granularity)
 
     def studyTextChanged(self):
+        """
 
+        """
         studyTextChanged(self)
 
     def bboxTextChanged(self):
+        """
 
+        """
         try:
             bbox = list([float(self.w_ll_lon.text()), float(self.w_ll_lat.text()),
                          float(self.w_ur_lon.text()), float(self.w_ur_lat.text())])
@@ -376,7 +402,9 @@ class Form(QWidget):
             pass
 
     def createSimsClicked(self):
+        """
 
+        """
         func_name = __prog__ + ' createSimsClicked'
         study = self.w_study.text()
         if study == '':
@@ -398,9 +426,9 @@ class Form(QWidget):
             self.runEcosseClicked()
 
     def runEcosseClicked(self):
-
-        # components of the command string have been checked at startup
-        # =============================================================
+        """
+        NB components of the command string have been checked at startup
+        """
         if write_runsites_config_file(self):
             # run the make simulations script
             # ===============================
@@ -412,11 +440,9 @@ class Form(QWidget):
             print('Time taken: {}'.format(round(end_time - start_time)))
 
     def saveClicked(self):
+        """
 
-        func_name = __prog__ + ' saveClicked'
-
-        # check for spaces
-        # ================
+        """
         study = self.w_study.text()
         if study == '':
             print('study cannot be blank')
@@ -428,17 +454,15 @@ class Form(QWidget):
                 build_and_display_studies(self)
 
     def cancelClicked(self):
+        """
 
-        func_name = __prog__ + ' cancelClicked'
-
+        """
         exit_clicked(self, write_config_flag=False)
 
     def exitClicked(self):
-        '''
+        """
         exit cleanly
-        '''
-        # check for spaces
-        # ================
+        """
         study = self.w_study.text()
         if study == '':
             print('study cannot be blank')
@@ -449,15 +473,15 @@ class Form(QWidget):
                 exit_clicked(self)
 
     def changeConfigFile(self):
-        '''
+        """
         permits change of configuration file
-        '''
+        """
         changeConfigFile(self)
 
     def fetchPiCsvFile(self):
-        '''
+        """
         Select CSV file of plant inputs
-        '''
+        """
         fname = self.w_lbl_pi_csv.text()
         fname, dummy = QFileDialog.getOpenFileName(self, 'Select CSV of plant inputs', fname, 'CSV file (*.csv)')
         fname = normpath(fname)
@@ -465,10 +489,10 @@ class Form(QWidget):
             self.w_lbl_pi_csv.setText(fname)
 
     def fetchPiNcFile(self):
-        '''
+        """
         Select NetCDF file of plant inputs
         if user canels then fname is returned as an empty string
-        '''
+        """
         fname = self.w_lbl_pi_nc.text()
         fname, dummy = QFileDialog.getOpenFileName(self, 'Select NetCDF of plant inputs', fname, 'NetCDF file (*.nc)')
         if fname != '':
@@ -477,15 +501,18 @@ class Form(QWidget):
             self.w_lbl_pi_nc.setText(fname)
 
     def adustPiCsv(self):
+        """
 
+        """
         if self.w_use_pi_nc.isChecked():
             self.w_use_pi_csv.setCheckState(0)
 
     def adustPiNc(self):
+        """
 
+        """
         if self.w_use_pi_csv.isChecked():
             self.w_use_pi_nc.setCheckState(0)
-
 
 def main():
     """
