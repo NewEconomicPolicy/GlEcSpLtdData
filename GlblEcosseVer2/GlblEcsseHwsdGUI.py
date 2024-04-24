@@ -248,11 +248,12 @@ class Form(QWidget):
 
         irow += 1
         w_soil_outpts = QPushButton("Make soil files")
-        helpText = 'Generate CSV data of soil carbon (Dominant), pH and bulk density for the HoliSoils project'
+        helpText = 'For the HoliSoils project - not developed'
         w_soil_outpts.setToolTip(helpText)
         w_soil_outpts.setFixedWidth(STD_BTN_SIZE_100)
         grid.addWidget(w_soil_outpts, irow, 6)
         w_soil_outpts.clicked.connect(self.genSoilOutptsClicked)
+        w_soil_outpts.setEnabled(False)
         self.w_soil_outpts = w_soil_outpts
 
         # LH vertical box consists of png image
