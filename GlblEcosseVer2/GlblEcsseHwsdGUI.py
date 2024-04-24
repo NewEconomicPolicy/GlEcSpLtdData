@@ -173,9 +173,6 @@ class Form(QWidget):
         grid.addWidget(w_hwsd_fn, irow, 2, 1, 5)
         self.w_hwsd_fn = w_hwsd_fn
 
-        irow += 1
-        grid.addWidget(QLabel(''), irow, 2)  # spacer
-
         # HWSD AOI bounding box detail
         # ============================
         irow += 1
@@ -184,7 +181,10 @@ class Form(QWidget):
         grid.addWidget(w_lbl07, irow, 0)
 
         self.w_hwsd_bbox = QLabel('')
-        grid.addWidget(self.w_hwsd_bbox, irow, 1, 1, 5)
+        grid.addWidget(self.w_hwsd_bbox, irow, 2, 1, 5)
+
+        irow += 1
+        grid.addWidget(QLabel(''), irow, 2)  # spacer
 
         # create weather and grid resolution
         # ==================================
