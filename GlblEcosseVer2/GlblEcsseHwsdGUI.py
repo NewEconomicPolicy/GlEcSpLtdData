@@ -46,7 +46,7 @@ WARN_STR = '*** Warning *** '
 
 class Form(QWidget):
     """
-
+    C
     """
     def __init__(self, parent=None):
 
