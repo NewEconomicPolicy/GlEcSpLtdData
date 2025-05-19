@@ -31,7 +31,7 @@ def generate_soil_output(form):
     """
     called from GUI
     """
-    if form.hwsd_mu_globals == None:
+    if form.hwsd_mu_globals is None:
         print('Undetermined HWSD aoi - please select a valid HSWD csv file')
         return
 
