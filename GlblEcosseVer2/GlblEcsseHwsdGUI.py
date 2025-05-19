@@ -246,7 +246,16 @@ class Form(QWidget):
         w_wthr.clicked.connect(self.genWthrOnlyClicked)
         self.w_wthr = w_wthr
 
+        # =============================================
         irow += 1
+        lbl02a = QLabel('Maximum cells:')
+        lbl02a.setAlignment(Qt.AlignRight)
+        grid.addWidget(lbl02a, irow, 0)
+
+        w_max_cells = QLineEdit()
+        grid.addWidget(w_max_cells, irow, 1)
+        self.w_max_cells = w_max_cells
+
         w_soil_outpts = QPushButton("Make soil files")
         helpText = 'For the HoliSoils project - not developed'
         w_soil_outpts.setToolTip(helpText)
@@ -406,7 +415,6 @@ class Form(QWidget):
         """
 
         """
-        func_name = __prog__ + ' createSimsClicked'
         study = self.w_study.text()
         if study == '':
             print('study cannot be blank')

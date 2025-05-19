@@ -25,7 +25,7 @@ from initialise_common_funcs import check_lu_pi_json_fname
 from glbl_ecss_cmmn_cmpntsGUI import calculate_grid_cell
 from mngmnt_fns_and_class import check_xls_coords_fname
 
-MIN_GUI_LIST = ['weatherResource', 'aveWthrFlag', 'bbox', 'luPiJsonFname', 'hwsdCsvFname']
+MIN_GUI_LIST = ['weatherResource', 'aveWthrFlag', 'bbox', 'luPiJsonFname', 'hwsdCsvFname', 'maxCells']
 CMN_GUI_LIST = ['study', 'histStrtYr', 'histEndYr', 'climScnr', 'futStrtYr', 'futEndYr', 'gridResol', 'eqilMode']
 BBOX_DEFAULT = [116.90045, 28.2294, 117.0, 29.0]    # bounding box default - somewhere in SE Europe
 sleepTime = 5
@@ -88,10 +88,13 @@ def read_config_file(form):
     grp = 'minGUI'
     for key in MIN_GUI_LIST:
         if key not in config[grp]:
-            print(ERROR_STR + 'setting {} is required in group {} of config file {}'.format(key, grp, config_file))
-            form.bbox = BBOX_DEFAULT
-            form.csv_fname = ''
-            return False
+            if key == 'maxCells':
+                config[grp]['maxCells'] = 999999
+            else:
+                print(ERROR_STR + 'setting {} is required in group {} of config file {}'.format(key, grp, config_file))
+                form.bbox = BBOX_DEFAULT
+                form.csv_fname = ''
+                return False
 
     # added July 2020 to enable MK plant inputs NC file
     # =================================================
@@ -108,6 +111,9 @@ def read_config_file(form):
     check_plant_input_nc(form, pi_nc_fname)
 
     # ==== end of MK plant inputs NC file extension =====
+
+    max_cells = config[grp]['maxCells']
+    form.w_max_cells.setText(str(max_cells))
 
     # added March 2021 to enable Marta and Joe plant inputs CSV file
     # ==============================================================
@@ -276,6 +282,7 @@ def write_config_file(form, message_flag = True):
             'bbox'            : form.bbox,
             'snglPntFlag'     : False,
             'weatherResource' : weather_resource,
+            'maxCells': form.w_max_cells.text(),
             'aveWthrFlag'  : form.w_ave_weather.isChecked(),
             'hwsdCsvFname' : hwsd_csv_fname,
             'luPiJsonFname': form.w_lbl13.text(),
